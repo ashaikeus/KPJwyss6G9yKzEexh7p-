@@ -50,8 +50,7 @@ class S21Matrix {
         double operator()(int r, int c);
 
         bool IsIncorrect() const;
-        // void GetMinorMatrix(const S21Matrix& M, int row, int col, S21Matrix& result);
-        // double DetProcessing(const S21Matrix& A);
+        S21Matrix GetMinorMatrix(int row, int col);
 
         void Print();
 };

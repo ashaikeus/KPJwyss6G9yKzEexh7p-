@@ -101,10 +101,69 @@ void S21Matrix::MulMatrix(const S21Matrix& other) {
     }
 }
 
-// S21Matrix S21Matrix::Transpose();
-// S21Matrix S21Matrix::CalcComplements();
-// double S21Matrix::Determinant();
-// S21Matrix S21Matrix::InverseMatrix();
+S21Matrix S21Matrix::Transpose() {
+    S21Matrix result(cols_, rows_);
+    if (IsIncorrect()) std::cout << "Incorrect matrix" << std::endl;
+    else {
+        for (int i = 0; i < rows_; i++)
+            for (int j = 0; j < cols_; j++) {
+                result.matrix_[j * cols_ + i] = (*this)(i, j);
+            }
+    }
+    *this = result;
+}
+
+S21Matrix S21Matrix::CalcComplements() {
+    S21Matrix result(cols_, rows_);
+    if (IsIncorrect()) std::cout << "Incorrect matrix" << std::endl;
+    else if (cols_ != rows_) std::cout << "Incorrect matrix size" << std::endl;
+    else if (cols_ == 1) result.matrix_[0] = (*this)(0, 0);
+    else {
+        S21Matrix temp(cols_, rows_);
+        for (int i = 0; i < rows_; i++) {
+            for (int j = 0; j < cols_; j++) {
+                temp.matrix_[i * cols_ + j] = (*this)(i, j);
+            }
+        }
+        for (int i = 0; i < rows_; i++)
+            for (int j = 0; j < cols_; j++) {
+                S21Matrix minor(temp.GetMinorMatrix(i, j));
+                double MinorDet = minor.Determinant();
+                result.matrix_[i * cols_ + j] = pow(-1.0, i + j) * MinorDet;
+            }
+    }
+}
+
+double S21Matrix::Determinant() {
+    double result = 0.0 / 0.0;
+    if (IsIncorrect()) std::cout << "Incorrect matrix" << std::endl;
+    else if (cols_ != rows_) std::cout << "Incorrect matrix size" << std::endl;
+    else {
+        result = 1.0;
+        if (rows_ == 1) result = matrix_[0];
+        else if (rows_ == 2) result = (matrix_[0] * matrix_[3]) - (matrix_[1] * matrix_[2]);
+        else for (int j = 0; j < cols_; j++) {
+            S21Matrix temp(*this);
+            for (int k = 0; k < rows_ - 1; k++) {
+                for (int i = k + 1; i < rows_; i++) {
+                    double factor = temp(i, k) / temp(k, k);
+                    for (int j = k; j < rows_; j++) {
+                        temp.matrix_[i * cols_ + j] -= factor * temp(k, j);
+                    }
+                }
+            }
+            for (int i = 0; i < rows_; i++) {
+                if (temp(i, i) == temp(i, i)) result *= temp(i, i);
+            }
+        }
+    }
+    if (result < S21_EPS && result > -S21_EPS) result = 0.0;
+    return result;
+}
+
+S21Matrix S21Matrix::InverseMatrix() {
+    
+}
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) {
     bool ret = true;
@@ -182,33 +241,16 @@ bool S21Matrix::IsIncorrect() const {
     return !(cols_ > 0 && rows_ > 0);
 }
 
-// void S21Matrix::GetMinorMatrix(const S21Matrix& M, int row, int col, S21Matrix& result) {
-//     result = S21Matrix(M->rows - 1, M->columns - 1);
-//     for (int r = 0, i = 0; r < M->rows - 1; r++) {
-//         for (int c = 0, j = 0; c < M->columns - 1; c++) {
-//             if (r == row) i = 1;
-//             if (c == col) j = 1;
-//             result->matrix[r][c] = M->matrix[r + i][c + j];
-//         }
-//     }
-// }
-
-// double S21Matrix::DetProcessing(const S21Matrix& A) {
-//   int sign = 1;
-//   double temp = 0.0;
-//   if (rows_ == 1) return A->matrix[0][0];
-//   if (rows_ == 2)
-//     return (A->matrix[0][0] * A->matrix[1][1]) -
-//            (A->matrix[1][0] * A->matrix[0][1]);
-//   for (int j = 0; j < A->columns; j++) {
-//     matrix_t minored = {0};
-//     GetMinorMatrix(A, 0, j, &minored);
-//     temp += A->matrix[0][j] * DetProcessing(&minored) * sign;
-//     s21_remove_matrix(&minored);
-//     sign = -sign;
-//   }
-//   return temp;
-// }
+S21Matrix S21Matrix::GetMinorMatrix(int row, int col) {
+    S21Matrix result(rows_ - 1, cols_ - 1);
+    for (int r = 0, i = 0; r < rows_ - 1; r++) {
+        for (int c = 0, j = 0; c < cols_ - 1; c++) {
+            if (r == row) i = 1;
+            if (c == col) j = 1;
+            result.matrix_[r * cols_ + c] = (*this)(r + i, c + j);
+        }
+    }
+}
 
 void S21Matrix::Print() {
     for (int i = 0; i < rows_; i++) {
