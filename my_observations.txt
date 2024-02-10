@@ -1,0 +1,3 @@
+s21_matrix+
+what I learnt:
+- operator overloading (member vs non-member)
