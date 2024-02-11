@@ -23,7 +23,7 @@ class S21Matrix {
         double get_cell(int index) const;
         void set_rows(int number);
         void set_cols(int number);
-        void set_cell(int index, double number);
+        void set_cell(int row, int col, double number);
 
         void SumMatrix(const S21Matrix& other);
         void SubMatrix(const S21Matrix& other);
@@ -33,6 +33,7 @@ class S21Matrix {
         S21Matrix Transpose();
         S21Matrix CalcComplements();
         double Determinant();
+        double DetProcessing();
         S21Matrix InverseMatrix();
 
         bool EqMatrix(const S21Matrix& other);

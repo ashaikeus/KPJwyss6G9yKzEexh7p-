@@ -5,21 +5,23 @@ S21Matrix::S21Matrix() : rows_(2), cols_(2) {
 }
 
 S21Matrix::S21Matrix(int n) : rows_(n), cols_(n) {
-    if (n <= 0) std::cout << "Invalid size for a square matrix" << std::endl;
+    if (n <= 0) throw std::length_error("Invalid size for a square matrix");
     matrix_ = new double[rows_ * cols_]{};
 }
 
 S21Matrix::S21Matrix(int r, int c) : rows_(r), cols_(c) {
-    if (r <= 0 || c <= 0) std::cout << "Invalid size" << std::endl;
+    if (r <= 0 || c <= 0) throw std::length_error("Invalid size");
     matrix_ = new double[rows_ * cols_]{};
 }
 
 S21Matrix::S21Matrix(const S21Matrix& other) : rows_(other.get_rows()), cols_(other.get_cols()) {
+    if (rows_ <= 0 || cols_ <= 0) throw std::length_error("Invalid size");
     matrix_ = new double[rows_ * cols_]{};
     std::copy_n(other.matrix_, rows_ * cols_, matrix_);
 }
 
-S21Matrix::S21Matrix(S21Matrix&& other) {
+S21Matrix::S21Matrix(S21Matrix&& other) : rows_(other.get_rows()), cols_(other.get_cols()) {
+    if (rows_ <= 0 || cols_ <= 0) throw std::length_error("Invalid size");
     matrix_ = new double[rows_ * cols_]{};
     std::copy_n(other.matrix_, rows_ * cols_, matrix_);
     other.cols_ = 0;
@@ -40,22 +42,22 @@ int S21Matrix::get_cols() const { return cols_; }
 double S21Matrix::get_cell(int index) const { return matrix_[index]; }
 
 void S21Matrix::set_rows(int number) { 
-    if (number < 1) std::cout << "Invalid number of rows" << std::endl;
+    if (number < 1) throw std::length_error("Invalid number of rows");
     else rows_ = number;
 }
 
 void S21Matrix::set_cols(int number) {
-    if (number < 1) std::cout << "Invalid number of columns" << std::endl;
+    if (number < 1) throw std::length_error("Invalid number of columns");
     else cols_ = number;
 }
 
-void S21Matrix::set_cell(int index, double number) {
-    matrix_[index] = number;
+void S21Matrix::set_cell(int row, int col, double number) {
+    matrix_[row * cols_ + col] = number;
 }
 
 void S21Matrix::SumMatrix(const S21Matrix& other) {
-    if (IsIncorrect() || other.IsIncorrect()) std::cout << "Invalid matrices" << std::endl;
-    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) std::cout << "Invalid matrix size" << std::endl;
+    if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
+    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Invalid matrix size");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
@@ -65,8 +67,8 @@ void S21Matrix::SumMatrix(const S21Matrix& other) {
 }
 
 void S21Matrix::SubMatrix(const S21Matrix& other) {
-    if (IsIncorrect() || other.IsIncorrect()) std::cout << "Invalid matrices" << std::endl;
-    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) std::cout << "Invalid matrix size" << std::endl;
+    if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
+    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Invalid matrix size");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
@@ -76,7 +78,7 @@ void S21Matrix::SubMatrix(const S21Matrix& other) {
 }
 
 void S21Matrix::MulNumber(const double num) {
-    if (IsIncorrect()) std::cout << "Invalid matrix" << std::endl;
+    if (IsIncorrect()) throw std::length_error("Invalid matrix");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
@@ -86,8 +88,8 @@ void S21Matrix::MulNumber(const double num) {
 }
 
 void S21Matrix::MulMatrix(const S21Matrix& other) {
-    if (IsIncorrect() || other.IsIncorrect()) std::cout << "Invalid matrices" << std::endl;
-    else if ((cols_ != other.get_rows())) std::cout << "Invalid matrix size" << std::endl;
+    if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
+    else if ((cols_ != other.get_rows())) throw std::length_error("Invalid matrix size");
     else {
         S21Matrix result(rows_, other.get_cols());
         for (int i = 0; i < rows_; i++) {
@@ -103,20 +105,20 @@ void S21Matrix::MulMatrix(const S21Matrix& other) {
 
 S21Matrix S21Matrix::Transpose() {
     S21Matrix result(cols_, rows_);
-    if (IsIncorrect()) std::cout << "Incorrect matrix" << std::endl;
+    if (IsIncorrect()) throw std::length_error("Invalid matrix");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
                 result.matrix_[j * cols_ + i] = (*this)(i, j);
             }
     }
-    *this = result;
+    return result;
 }
 
 S21Matrix S21Matrix::CalcComplements() {
     S21Matrix result(cols_, rows_);
-    if (IsIncorrect()) std::cout << "Incorrect matrix" << std::endl;
-    else if (cols_ != rows_) std::cout << "Incorrect matrix size" << std::endl;
+    if (IsIncorrect()) throw std::length_error("Invalid matrix");
+    else if (cols_ != rows_) throw std::length_error("Invalid matrix size");
     else if (cols_ == 1) result.matrix_[0] = (*this)(0, 0);
     else {
         S21Matrix temp(cols_, rows_);
@@ -132,37 +134,35 @@ S21Matrix S21Matrix::CalcComplements() {
                 result.matrix_[i * cols_ + j] = pow(-1.0, i + j) * MinorDet;
             }
     }
+    return result;
 }
 
 double S21Matrix::Determinant() {
     double result = 0.0 / 0.0;
-    if (IsIncorrect()) std::cout << "Incorrect matrix" << std::endl;
-    else if (cols_ != rows_) std::cout << "Incorrect matrix size" << std::endl;
+    if (IsIncorrect()) throw std::length_error("Invalid matrix");
+    else if (cols_ != rows_) throw std::length_error("Invalid matrix size");
     else {
-        result = 1.0;
-        if (rows_ == 1) result = matrix_[0];
-        else if (rows_ == 2) result = (matrix_[0] * matrix_[3]) - (matrix_[1] * matrix_[2]);
-        else for (int j = 0; j < cols_; j++) {
-            S21Matrix temp(*this);
-            for (int k = 0; k < rows_ - 1; k++) {
-                for (int i = k + 1; i < rows_; i++) {
-                    double factor = temp(i, k) / temp(k, k);
-                    for (int j = k; j < rows_; j++) {
-                        temp.matrix_[i * cols_ + j] -= factor * temp(k, j);
-                    }
-                }
-            }
-            for (int i = 0; i < rows_; i++) {
-                if (temp(i, i) == temp(i, i)) result *= temp(i, i);
-            }
-        }
+        result = DetProcessing();
     }
     if (result < S21_EPS && result > -S21_EPS) result = 0.0;
     return result;
 }
 
+double S21Matrix::DetProcessing() {
+    int sign = 1;
+    double temp = 0.0;
+    if (rows_ == 1) return (*this)(0, 0);
+    else if (rows_ == 2) return ((*this)(0, 0) * (*this)(1, 1)) - ((*this)(1, 0) * (*this)(0, 1));
+    else for (int j = 0; j < cols_; j++) {
+        S21Matrix minor(GetMinorMatrix(0, j));
+        temp += (*this)(0, j) * minor.DetProcessing() * sign;
+        sign = -sign;
+    }
+    return temp;
+}
+
 S21Matrix S21Matrix::InverseMatrix() {
-    
+    return *this;
 }
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) {
@@ -233,7 +233,7 @@ S21Matrix& S21Matrix::operator*=(const S21Matrix& other) {
 }
 
 double S21Matrix::operator()(int r, int c) {
-    if (r < 0 || c < 0 || r >= rows_ || c >= cols_) std::cout << "Index outside of matrix" << std::endl;
+    if (r < 0 || c < 0 || r >= rows_ || c >= cols_) throw std::length_error("Index outside of matrix");
     return matrix_[r * cols_ + c];
 }
 
@@ -241,15 +241,19 @@ bool S21Matrix::IsIncorrect() const {
     return !(cols_ > 0 && rows_ > 0);
 }
 
-S21Matrix S21Matrix::GetMinorMatrix(int row, int col) {
+S21Matrix S21Matrix::GetMinorMatrix(int avoidRow, int avoidCol) {
     S21Matrix result(rows_ - 1, cols_ - 1);
-    for (int r = 0, i = 0; r < rows_ - 1; r++) {
-        for (int c = 0, j = 0; c < cols_ - 1; c++) {
-            if (r == row) i = 1;
-            if (c == col) j = 1;
-            result.matrix_[r * cols_ + c] = (*this)(r + i, c + j);
+    bool rowSkip = false;
+    bool colSkip = false;
+    for (int r = 0; r < rows_ - 1; r++) {
+        if (r == avoidRow) rowSkip = true;
+        for (int c = 0; c < cols_ - 1; c++) {
+            if (c == avoidCol) colSkip = true;
+            result.set_cell(r, c, (*this)(r + rowSkip, c + colSkip));
         }
+        colSkip = false;
     }
+    return result;
 }
 
 void S21Matrix::Print() {
