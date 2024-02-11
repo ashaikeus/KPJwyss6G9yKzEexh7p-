@@ -57,7 +57,7 @@ void S21Matrix::set_cell(int row, int col, double number) {
 
 void S21Matrix::SumMatrix(const S21Matrix& other) {
     if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
-    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Invalid matrix size");
+    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Different matrix dimensions");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
@@ -68,7 +68,7 @@ void S21Matrix::SumMatrix(const S21Matrix& other) {
 
 void S21Matrix::SubMatrix(const S21Matrix& other) {
     if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
-    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Invalid matrix size");
+    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Different matrix dimensions");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
@@ -89,7 +89,7 @@ void S21Matrix::MulNumber(const double num) {
 
 void S21Matrix::MulMatrix(const S21Matrix& other) {
     if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
-    else if ((cols_ != other.get_rows())) throw std::length_error("Invalid matrix size");
+    else if ((cols_ != other.get_rows())) throw std::length_error("The number of columns of the first matrix is not equal to the number of rows of the second matrix");
     else {
         S21Matrix result(rows_, other.get_cols());
         for (int i = 0; i < rows_; i++) {
@@ -118,7 +118,7 @@ S21Matrix S21Matrix::Transpose() {
 S21Matrix S21Matrix::CalcComplements() {
     S21Matrix result(cols_, rows_);
     if (IsIncorrect()) throw std::length_error("Invalid matrix");
-    else if (cols_ != rows_) throw std::length_error("Invalid matrix size");
+    else if (cols_ != rows_) throw std::length_error("The matrix is not square");
     else if (cols_ == 1) result.matrix_[0] = (*this)(0, 0);
     else {
         S21Matrix temp(cols_, rows_);
@@ -140,7 +140,7 @@ S21Matrix S21Matrix::CalcComplements() {
 double S21Matrix::Determinant() {
     double result = 0.0 / 0.0;
     if (IsIncorrect()) throw std::length_error("Invalid matrix");
-    else if (cols_ != rows_) throw std::length_error("Invalid matrix size");
+    else if (cols_ != rows_) throw std::length_error("The matrix is not square");
     else {
         result = DetProcessing();
     }
@@ -162,7 +162,21 @@ double S21Matrix::DetProcessing() {
 }
 
 S21Matrix S21Matrix::InverseMatrix() {
-    return *this;
+    int det = Determinant();
+    if (IsIncorrect()) throw std::length_error("Invalid matrix");
+    else if (fabs(det) < S21_EPS) throw std::length_error("Can't inverse: determinant equals 0");
+    else if (cols_ != rows_) throw std::length_error("Can't inverse: matrix is not square");
+
+    S21Matrix result(rows_, cols_);
+    if (rows_ == 1)
+        result.set_cell(0, 0, 1.0 / (*this)(0, 0));
+    else {
+        S21Matrix temp(rows_, cols_);
+        result = CalcComplements();
+        result = result.Transpose();
+        result.MulNumber(1.0 / det);
+    }
+    return result;
 }
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) {

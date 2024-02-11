@@ -18,25 +18,26 @@ class S21Matrix {
         S21Matrix(const S21Matrix& other);
         S21Matrix(S21Matrix&& other);
 
+        bool EqMatrix(const S21Matrix& other);
+        void SumMatrix(const S21Matrix& other);
+        void SubMatrix(const S21Matrix& other);
+        void MulNumber(const double num);
+        void MulMatrix(const S21Matrix& other);
+
+        bool IsIncorrect() const;
+        S21Matrix Transpose();
+        S21Matrix CalcComplements();
+        double Determinant();
+        double DetProcessing();
+        S21Matrix InverseMatrix();
+        S21Matrix GetMinorMatrix(int row, int col);
+
         int get_rows() const;
         int get_cols() const;
         double get_cell(int index) const;
         void set_rows(int number);
         void set_cols(int number);
         void set_cell(int row, int col, double number);
-
-        void SumMatrix(const S21Matrix& other);
-        void SubMatrix(const S21Matrix& other);
-        void MulNumber(const double num);
-        void MulMatrix(const S21Matrix& other);
-
-        S21Matrix Transpose();
-        S21Matrix CalcComplements();
-        double Determinant();
-        double DetProcessing();
-        S21Matrix InverseMatrix();
-
-        bool EqMatrix(const S21Matrix& other);
 
         S21Matrix operator+(const S21Matrix& other);
         S21Matrix operator-(const S21Matrix& other);
@@ -49,9 +50,6 @@ class S21Matrix {
         S21Matrix& operator*=(const double num);
         S21Matrix& operator*=(const S21Matrix& other);
         double operator()(int r, int c);
-
-        bool IsIncorrect() const;
-        S21Matrix GetMinorMatrix(int row, int col);
 
         void Print();
 };

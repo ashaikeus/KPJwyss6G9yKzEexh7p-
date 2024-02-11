@@ -47,6 +47,7 @@ int main() {
     H.set_cell(4, 4, 1);
     H.Print();
     std::cout << H.Determinant() << std::endl;
+    (H.InverseMatrix()).Print();
 
     return 0;
 }
