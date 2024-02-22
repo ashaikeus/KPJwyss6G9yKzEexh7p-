@@ -13,7 +13,7 @@ style:
 
 checks: style
 	g++ $(FLAGS) $(CODE_FILES) $(TEST_FILES) $(LIB_FLAGS)
-	cppcheck *.c *.h
+	cppcheck *.cpp *.h
 
 clean:
 	rm -rf report *.a *.o *.gcda *.gcno *.gcov *.info test *.out *.dSYM *.exe

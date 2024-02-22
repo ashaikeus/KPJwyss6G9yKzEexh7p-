@@ -34,8 +34,8 @@ TEST(MatrixConstructorSuite, SetRowsTest) {
   testMatrix.setRows(3);
   EXPECT_EQ(testMatrix.getRows(), 3);
 
-  // EXPECT_DOUBLE_EQ(testMatrix(1, 1), 3.0);
-  // EXPECT_DOUBLE_EQ(testMatrix(2, 1), 0.0);
+  EXPECT_DOUBLE_EQ(testMatrix(1, 1), 3.0);
+  EXPECT_DOUBLE_EQ(testMatrix(2, 1), 0.0);
 }
 
 TEST(MatrixConstructorSuite, SetWrongTest) {
@@ -262,7 +262,7 @@ TEST(MatrixOperatorSuite, PlusMinusTest) {
       testMatrix2.setCell(i, j, 4);
     }
   }
-  S21Matrix resultMatrix = testMatrix + testMatrix2;
+  S21Matrix resultMatrix(testMatrix + testMatrix2);
   EXPECT_DOUBLE_EQ(resultMatrix(0, 0), 7.0);
   EXPECT_DOUBLE_EQ(resultMatrix(2, 2), 7.0);
 
@@ -326,6 +326,9 @@ TEST(MatrixOperatorSuite, MultiplicationTest) {
 
 int main() {
   testing::InitGoogleTest();
-  testing::GTEST_FLAG(filter) = "MatrixConstructorSuite*";
+  // testing::GTEST_FLAG(filter) = "MatrixConstructorSuite*";
+  // testing::GTEST_FLAG(filter) = "MatrixArithmeticSuite*";
+  // testing::GTEST_FLAG(filter) = "MatrixFunctionSuite*";
+  // testing::GTEST_FLAG(filter) = "MatrixOperatorSuite*";
   return RUN_ALL_TESTS();
 }
