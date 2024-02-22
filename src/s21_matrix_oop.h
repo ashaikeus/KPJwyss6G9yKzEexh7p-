@@ -32,12 +32,12 @@ class S21Matrix {
         S21Matrix InverseMatrix();
         S21Matrix GetMinorMatrix(int row, int col);
 
-        int get_rows() const;
-        int get_cols() const;
-        double get_cell(int index) const;
-        void set_rows(int number);
-        void set_cols(int number);
-        void set_cell(int row, int col, double number);
+        int getRows() const;
+        int getCols() const;
+        double getCell(int index) const;
+        void setRows(int number);
+        void setCols(int number);
+        void setCell(int row, int col, double number);
 
         S21Matrix operator+(const S21Matrix& other);
         S21Matrix operator-(const S21Matrix& other);

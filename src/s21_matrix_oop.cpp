@@ -14,13 +14,13 @@ S21Matrix::S21Matrix(int r, int c) : rows_(r), cols_(c) {
     matrix_ = new double[rows_ * cols_]{};
 }
 
-S21Matrix::S21Matrix(const S21Matrix& other) : rows_(other.get_rows()), cols_(other.get_cols()) {
+S21Matrix::S21Matrix(const S21Matrix& other) : rows_(other.getRows()), cols_(other.getCols()) {
     if (rows_ <= 0 || cols_ <= 0) throw std::length_error("Invalid size");
     matrix_ = new double[rows_ * cols_]{};
     std::copy_n(other.matrix_, rows_ * cols_, matrix_);
 }
 
-S21Matrix::S21Matrix(S21Matrix&& other) : rows_(other.get_rows()), cols_(other.get_cols()) {
+S21Matrix::S21Matrix(S21Matrix&& other) : rows_(other.getRows()), cols_(other.getCols()) {
     if (rows_ <= 0 || cols_ <= 0) throw std::length_error("Invalid size");
     matrix_ = new double[rows_ * cols_]{};
     std::copy_n(other.matrix_, rows_ * cols_, matrix_);
@@ -35,44 +35,62 @@ S21Matrix::~S21Matrix() {
     delete[] matrix_;
 }
 
-int S21Matrix::get_rows() const { return rows_; }
+int S21Matrix::getRows() const { return rows_; }
 
-int S21Matrix::get_cols() const { return cols_; }
+int S21Matrix::getCols() const { return cols_; }
 
-double S21Matrix::get_cell(int index) const { return matrix_[index]; }
+double S21Matrix::getCell(int index) const { return matrix_[index]; }
 
-void S21Matrix::set_rows(int number) { 
+void S21Matrix::setRows(int number) { 
     if (number < 1) throw std::length_error("Invalid number of rows");
-    else rows_ = number;
+    else if (number > getRows()) { 
+        for (int i = getRows(); i < number; i++) {
+            for (int j = 0; j < getCols(); j++) {
+                setCell(i, j, 0);
+            }
+        }
+    }
+    rows_ = number;
 }
 
-void S21Matrix::set_cols(int number) {
+void S21Matrix::setCols(int number) {
     if (number < 1) throw std::length_error("Invalid number of columns");
-    else cols_ = number;
+    else if (number > getCols()) { 
+        for (int i = 0; i < getRows(); i++) {
+            for (int j = getCols(); j < number; j++) {
+                setCell(i, j, 0);
+            }
+        }
+    }
+    cols_ = number;
 }
 
-void S21Matrix::set_cell(int row, int col, double number) {
-    matrix_[row * cols_ + col] = number;
+void S21Matrix::setCell(int row, int col, double number) {
+    if (row > 0 && row < rows_ && col > 0 && col < cols_) matrix_[row * cols_ + col] = number;
+    else {
+        std::cout << "row: " << row << ", col: " << col << std::endl;
+        throw std::length_error("Invalid index");
+    }
 }
 
 void S21Matrix::SumMatrix(const S21Matrix& other) {
     if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
-    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Different matrix dimensions");
+    else if ((rows_ != other.getRows()) || (cols_ != other.getCols())) throw std::length_error("Different matrix dimensions");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
-                matrix_[i * cols_ + j] = matrix_[i * cols_ + j] + other.matrix_[i * other.get_cols() + j];
+                matrix_[i * cols_ + j] = matrix_[i * cols_ + j] + other.matrix_[i * other.getCols() + j];
             }
         }
 }
 
 void S21Matrix::SubMatrix(const S21Matrix& other) {
     if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
-    else if ((rows_ != other.get_rows()) || (cols_ != other.get_cols())) throw std::length_error("Different matrix dimensions");
+    else if ((rows_ != other.getRows()) || (cols_ != other.getCols())) throw std::length_error("Different matrix dimensions");
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
-                matrix_[i * cols_ + j] = matrix_[i * cols_ + j] - other.matrix_[i * other.get_cols() + j];
+                matrix_[i * cols_ + j] = matrix_[i * cols_ + j] - other.matrix_[i * other.getCols() + j];
             }
         }
 }
@@ -89,13 +107,13 @@ void S21Matrix::MulNumber(const double num) {
 
 void S21Matrix::MulMatrix(const S21Matrix& other) {
     if (IsIncorrect() || other.IsIncorrect()) throw std::length_error("Invalid matrices");
-    else if ((cols_ != other.get_rows())) throw std::length_error("The number of columns of the first matrix is not equal to the number of rows of the second matrix");
+    else if ((cols_ != other.getRows())) throw std::length_error("The number of columns of the first matrix is not equal to the number of rows of the second matrix");
     else {
-        S21Matrix result(rows_, other.get_cols());
+        S21Matrix result(rows_, other.getCols());
         for (int i = 0; i < rows_; i++) {
-            for (int j = 0; j < other.get_cols(); j++) {
-                for (int k = 0; k < other.get_rows(); k++) {
-                    result.matrix_[i * cols_ + j] += matrix_[i * cols_ + k] * other.get_cell(k * other.get_cols() + j);
+            for (int j = 0; j < other.getCols(); j++) {
+                for (int k = 0; k < other.getRows(); k++) {
+                    result.matrix_[i * other.getCols() + j] += matrix_[i * cols_ + k] * other.getCell(k * other.getCols() + j);
                 }
             }
         }
@@ -109,7 +127,7 @@ S21Matrix S21Matrix::Transpose() {
     else {
         for (int i = 0; i < rows_; i++)
             for (int j = 0; j < cols_; j++) {
-                result.matrix_[j * cols_ + i] = (*this)(i, j);
+                result.setCell(j, i, (*this)(i, j));
             }
     }
     return result;
@@ -169,7 +187,7 @@ S21Matrix S21Matrix::InverseMatrix() {
 
     S21Matrix result(rows_, cols_);
     if (rows_ == 1)
-        result.set_cell(0, 0, 1.0 / (*this)(0, 0));
+        result.setCell(0, 0, 1.0 / (*this)(0, 0));
     else {
         S21Matrix temp(rows_, cols_);
         result = CalcComplements();
@@ -181,12 +199,12 @@ S21Matrix S21Matrix::InverseMatrix() {
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) {
     bool ret = true;
-    if ((rows_ != other.get_rows()) || (cols_ != other.get_cols()))
+    if ((rows_ != other.getRows()) || (cols_ != other.getCols()))
         ret = false;
     else
         for (int i = 0; i < rows_ && ret; i++)
         for (int j = 0; j < cols_ && ret; j++) {
-            if (fabs((*this)(i, j) - other.get_cell(i * cols_ + j)) > S21_EPS) ret = false;
+            if (fabs((*this)(i, j) - other.getCell(i * cols_ + j)) > S21_EPS) ret = false;
         }
     return ret;
 }
@@ -220,8 +238,8 @@ bool S21Matrix::operator==(const S21Matrix& other) {
 }
 
 S21Matrix S21Matrix::operator=(const S21Matrix& other) {
-    rows_ = other.get_rows();
-    cols_ = other.get_cols();
+    rows_ = other.getRows();
+    cols_ = other.getCols();
     std::copy_n(other.matrix_, rows_ * cols_, matrix_);
     return *this;
 }
@@ -263,7 +281,7 @@ S21Matrix S21Matrix::GetMinorMatrix(int avoidRow, int avoidCol) {
         if (r == avoidRow) rowSkip = true;
         for (int c = 0; c < cols_ - 1; c++) {
             if (c == avoidCol) colSkip = true;
-            result.set_cell(r, c, (*this)(r + rowSkip, c + colSkip));
+            result.setCell(r, c, (*this)(r + rowSkip, c + colSkip));
         }
         colSkip = false;
     }
