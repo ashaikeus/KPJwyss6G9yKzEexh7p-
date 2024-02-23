@@ -1,11 +1,16 @@
 #include "../s21_matrix_oop.h"
 #include "gtest/gtest.h"
 
-
 TEST(MatrixConstructorSuite, BasicTest) {
   S21Matrix testMatrix;
   EXPECT_EQ(testMatrix.getCols(), 2);
   EXPECT_EQ(testMatrix.getRows(), 2);
+}
+
+TEST(MatrixConstructorSuite, SquareTest) {
+  S21Matrix testMatrix(3);
+  EXPECT_EQ(testMatrix.getCols(), 3);
+  EXPECT_EQ(testMatrix.getRows(), 3);
 }
 
 TEST(MatrixConstructorSuite, NormalTest) {
@@ -168,6 +173,13 @@ TEST(MatrixFunctionSuite, CalcComplementsErrorTest) {
   EXPECT_ANY_THROW(testMatrix.CalcComplements());
 }
 
+TEST(MatrixFunctionSuite, CalcComplements1x1Test) {
+  S21Matrix testMatrix(1);
+  testMatrix.setCell(0, 0, 1);
+  S21Matrix resultMatrix = testMatrix.CalcComplements();
+  EXPECT_TRUE(resultMatrix.EqMatrix(testMatrix));
+}
+
 TEST(MatrixFunctionSuite, CalcComplementsTest) {
   S21Matrix testMatrix;
   S21Matrix testMatrix2;
@@ -322,6 +334,12 @@ TEST(MatrixOperatorSuite, MultiplicationTest) {
   resultMatrix *= testMatrix;
   EXPECT_DOUBLE_EQ(resultMatrix(0, 0), 36.0);
   EXPECT_DOUBLE_EQ(resultMatrix(2, 1), 36.0);
+}
+
+TEST(HelperSuite, GetSetErrors) {
+  S21Matrix testMatrix;
+  EXPECT_ANY_THROW(testMatrix.getCell(91));
+  EXPECT_ANY_THROW(testMatrix.setCell(9, 1, 12));
 }
 
 int main() {

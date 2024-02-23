@@ -8,25 +8,21 @@ all:
 	./a.out
 
 style:
+	cp ../materials/linters/.clang-format .clang-format
 	clang-format -n *.cpp *.h
 	clang-format -i *.cpp *.h
+	rm .clang-format
 
 checks: style
 	g++ $(FLAGS) $(CODE_FILES) $(TEST_FILES) $(LIB_FLAGS)
-	cppcheck *.cpp *.h
 
 clean:
 	rm -rf report *.a *.o *.gcda *.gcno *.gcov *.info test *.out *.dSYM *.exe
 
 test: clean s21_matrix_oop.a
-	g++ $(TEST_FILES) -o test s21_matrix_oop.a -lcheck
+	g++ $(TEST_FILES) -o test s21_matrix_oop.a $(LIB_FLAGS)
 	./test
 	rm ./test
-
-main:
-	g++ $(CODE_FILES)
-	./a.out
-	rm ./a.out
 
 s21_matrix_oop.a:
 	g++ -c $(CODE_FILES)
