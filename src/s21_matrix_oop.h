@@ -12,6 +12,8 @@ class S21Matrix {
   // Attributes
   int rows_, cols_;  // Rows and columns
   double* matrix_;   // Pointer to the memory where the matrix is allocated
+
+ protected:
   double DetProcessing();
   S21Matrix GetMinorMatrix(int row, int col);
 
