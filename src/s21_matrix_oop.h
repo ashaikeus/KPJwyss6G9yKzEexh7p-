@@ -12,7 +12,6 @@ class S21Matrix {
   // Attributes
   int rows_, cols_;  // Rows and columns
   double* matrix_;   // Pointer to the memory where the matrix is allocated
-  void SetAllToZero();
   double DetProcessing();
   S21Matrix GetMinorMatrix(int row, int col);
 
@@ -23,6 +22,7 @@ class S21Matrix {
   S21Matrix(int rows, int cols);
   S21Matrix(const S21Matrix& other);
   S21Matrix(S21Matrix&& other);
+  void SetAllToZero();
 
   bool EqMatrix(const S21Matrix& other);
   void SumMatrix(const S21Matrix& other);
